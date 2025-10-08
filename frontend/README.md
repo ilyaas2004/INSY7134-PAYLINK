@@ -1,70 +1,512 @@
-# Getting Started with Create React App
+# PayLink - Secure International Payment Portal
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## INSY7314 - Application Development Security
+**Part 2: Customer Portal**
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📋 Project Overview
 
-### `npm start`
+PayLink is a secure web-based international payment portal that enables customers to make SWIFT payments through a bank's internal system. The application implements comprehensive security measures including SSL/TLS encryption, JWT authentication, input validation, and protection against common web vulnerabilities.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Team Members
+- **Ilyaas Kamish** - ST10391174
+- **Caleb** - ST10254714
+- **Daniel Wulfse** - ST10285153
+- **Nomvuseleo Mlambo** - ST10264503
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🔒 Security Features Implemented
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Password Security
+- **Bcrypt Hashing**: All passwords are hashed using bcrypt with 10 salt rounds
+- **Password Validation**: Enforces strong passwords (minimum 8 characters, uppercase, lowercase, numbers, special characters)
+- **No Plain-Text Storage**: Passwords are never stored in readable format
 
-### `npm run build`
+### 2. SSL/TLS Implementation
+- **HTTPS Only**: All traffic served over encrypted HTTPS connections
+- **TLS 1.2+**: Modern TLS protocols with strong cipher suites
+- **HSTS Enabled**: HTTP Strict Transport Security enforces secure connections
+- **Certificate Validation**: SSL certificates configured and validated
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 3. Input Validation & Whitelisting
+- **RegEx Patterns**: All inputs validated using regular expressions
+- **Whitelist Approach**: Only expected characters allowed
+- **Frontend & Backend Validation**: Double validation layer
+- **Sanitization**: All user inputs sanitized before processing
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 4. Attack Protection
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Session Hijacking Prevention
+- JWT tokens with 1-hour expiry
+- Secure token storage
+- Token validation on every request
+- Automatic logout on token expiration
 
-### `npm run eject`
+#### Clickjacking Prevention
+- X-Frame-Options: DENY header
+- Content Security Policy (CSP) configured
+- Frame-ancestors directive set
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### SQL Injection Prevention
+- MongoDB (NoSQL database)
+- Parameterized queries via Mongoose
+- Input validation and sanitization
+- Schema-based validation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Cross-Site Scripting (XSS) Prevention
+- Input sanitization on all user inputs
+- Output encoding via React
+- Content Security Policy headers
+- X-XSS-Protection header enabled
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### Man-in-the-Middle (MITM) Prevention
+- End-to-end TLS encryption
+- HSTS enforced
+- Strong cipher suites
+- Certificate pinning ready
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### DDoS Protection
+- Rate limiting (100 requests per 15 minutes)
+- Authentication rate limiting (5 attempts per 15 minutes)
+- Express-brute for brute force protection
+- Request throttling
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🛠️ Technology Stack
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend
+- **React** 18.2.0 - UI framework
+- **React Router DOM** 6.x - Client-side routing
+- **Axios** - HTTP client
+- **Tailwind CSS** 3.4.1 - Styling
+- **Lucide React** - Icons
 
-### Code Splitting
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** 4.21.2 - Web framework
+- **MongoDB** - Database
+- **Mongoose** 8.18.3 - ODM
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Security Packages
+- **bcryptjs** 3.0.2 - Password hashing
+- **jsonwebtoken** 9.0.2 - JWT authentication
+- **helmet** 8.1.0 - Security headers
+- **express-rate-limit** 8.1.0 - Rate limiting
+- **express-validator** 7.2.1 - Input validation
+- **cors** 2.8.5 - CORS handling
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📦 Installation & Setup
 
-### Making a Progressive Web App
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (local or MongoDB Atlas)
+- OpenSSL (for certificate generation)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Step 1: Clone Repository
+```bash
+git clone <repository-url>
+cd paylink-project
+```
 
-### Advanced Configuration
+### Step 2: Backend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+#### Install Dependencies
+```bash
+npm install
+```
 
-### Deployment
+#### Generate SSL Certificates (Development)
+```bash
+# Create ssl directory
+mkdir -p backend/config/ssl
+cd backend/config/ssl
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+# Generate self-signed certificate
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -days 365 \
+  -keyout key.pem -out cert.pem \
+  -subj "/C=ZA/ST=Western Cape/L=Cape Town/O=PayLink/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+  -addext "keyUsage=digitalSignature,keyEncipherment" \
+  -addext "extendedKeyUsage=serverAuth"
 
-### `npm run build` fails to minify
+cd ../../..
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+#### Install Certificate (Windows)
+```bash
+# Convert to .crt
+openssl x509 -outform der -in backend/config/ssl/cert.pem -out backend/config/ssl/cert.crt
+
+# Double-click cert.crt and install to:
+# "Local Machine" -> "Trusted Root Certification Authorities"
+```
+
+#### Configure Environment Variables
+Create `.env` in root directory:
+```env
+# Server Configuration
+PORT=5000
+NODE_ENV=production
+
+# MongoDB Connection
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/paylink
+
+# JWT Configuration
+JWT_SECRET=your_64_character_secret_key_here
+JWT_EXPIRE=1h
+
+# SSL Certificates
+SSL_KEY_PATH=backend/config/ssl/key.pem
+SSL_CERT_PATH=backend/config/ssl/cert.pem
+
+# CORS
+CLIENT_URL=https://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+```
+
+#### Generate JWT Secret
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+### Step 3: Frontend Setup
+
+#### Navigate to Frontend Directory
+```bash
+cd frontend
+```
+
+#### Install Dependencies
+```bash
+npm install
+```
+
+#### Configure Environment Variables
+Create `frontend/.env`:
+```env
+REACT_APP_API_URL=https://localhost:5000/api
+HTTPS=true
+SSL_CRT_FILE=../backend/config/ssl/cert.pem
+SSL_KEY_FILE=../backend/config/ssl/key.pem
+```
+
+#### Copy SSL Certificates (if needed)
+```bash
+mkdir ssl
+copy ../backend/config/ssl/cert.pem ssl/
+copy ../backend/config/ssl/key.pem ssl/
+```
+
+---
+
+## 🚀 Running the Application
+
+### Terminal 1 - Backend
+```bash
+# From project root
+npm run dev
+```
+Server starts at: `https://localhost:5000`
+
+### Terminal 2 - Frontend
+```bash
+cd frontend
+npm start
+```
+Application opens at: `https://localhost:3000`
+
+**Note**: Browser will show security warning for self-signed certificate. Click "Advanced" → "Proceed to localhost" to accept.
+
+---
+
+## 🧪 Testing the Application
+
+### 1. Registration Test
+- Navigate to `https://localhost:3000`
+- Click "Create Account"
+- Fill in the form:
+  - Full Name: `John Doe`
+  - ID Number: `9001015009087` (13 digits)
+  - Account Number: `1234567890` (10-16 digits)
+  - Username: `johndoe` (alphanumeric + underscore)
+  - Password: `Test@1234` (8+ chars, uppercase, lowercase, number, special char)
+- Submit and verify redirect to dashboard
+
+### 2. Login Test
+- Logout from dashboard
+- Navigate to login page
+- Enter credentials
+- Verify JWT token storage (DevTools → Application → Local Storage)
+- Verify redirect to dashboard
+
+### 3. Payment Creation Test
+- On dashboard, fill payment form:
+  - Amount: `1000.00`
+  - Currency: `USD`
+  - Payee Account: `9876543210`
+  - SWIFT Code: `ABNANL2A` (format: 6 letters + 2 alphanumeric)
+- Submit payment
+- Verify success message
+- Check payment appears in "Recent Payments"
+- Verify in MongoDB that payment status is "pending"
+
+### 4. Security Tests
+
+#### Input Validation
+- Try invalid ID number (not 13 digits)
+- Try invalid SWIFT code (wrong format)
+- Try weak password (less than 8 characters)
+- Verify error messages display
+
+#### Protected Routes
+- Logout
+- Try to access `https://localhost:3000/dashboard` directly
+- Verify redirect to login page
+
+#### Rate Limiting
+- Make 6+ failed login attempts quickly
+- Verify rate limit error message
+
+#### HTTPS Verification
+- Check browser address bar for padlock icon
+- Open DevTools → Network
+- Verify all requests use HTTPS protocol
+- Check response headers for security headers (Helmet)
+
+---
+
+## 📁 Project Structure
+
+```
+paylink-project/
+├── backend/
+│   ├── config/
+│   │   ├── db.js                    # MongoDB connection
+│   │   └── ssl/                     # SSL certificates
+│   │       ├── cert.pem
+│   │       └── key.pem
+│   ├── controllers/
+│   │   ├── authController.js        # Authentication logic
+│   │   └── paymentController.js     # Payment logic
+│   ├── middleware/
+│   │   ├── auth.js                  # JWT verification
+│   │   ├── validation.js            # Input validation
+│   │   └── security.js              # Security middleware
+│   ├── models/
+│   │   ├── User.js                  # User schema
+│   │   └── Payment.js               # Payment schema
+│   └── routes/
+│       ├── auth.js                  # Auth routes
+│       └── payment.js               # Payment routes
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── ProtectedRoute.js    # Route protection
+│   │   ├── pages/
+│   │   │   ├── LandingPage.js       # Landing page
+│   │   │   ├── RegisterPage.js      # Registration
+│   │   │   ├── LoginPage.js         # Login
+│   │   │   └── Dashboard.js         # Dashboard & payments
+│   │   ├── services/
+│   │   │   └── api.js               # API service layer
+│   │   ├── App.js                   # Main app component
+│   │   └── index.js                 # Entry point
+│   └── .env                         # Frontend environment variables
+├── .env                             # Backend environment variables
+├── server.js                        # Main server file
+├── package.json                     # Backend dependencies
+└── README.md                        # This file
+```
+
+---
+
+## 🔐 Security Validation Patterns
+
+### Input Validation RegEx
+
+```javascript
+// Full Name: Letters and spaces only
+/^[a-zA-Z\s]+$/
+
+// ID Number: Exactly 13 digits
+/^[0-9]{13}$/
+
+// Account Number: 10-16 digits
+/^[0-9]{10,16}$/
+
+// Username: Alphanumeric and underscore
+/^[a-zA-Z0-9_]+$/
+
+// Password: Strong password requirements
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+
+// SWIFT Code: 8 or 11 characters
+/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+
+// Payee Account: 8-34 alphanumeric characters
+/^[0-9A-Z]{8,34}$/
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: "Certificate not trusted" error
+**Solution**: Install the self-signed certificate in Windows Trusted Root Certification Authorities (see installation instructions above).
+
+### Issue: CORS error
+**Solution**: Ensure `CLIENT_URL` in backend `.env` matches frontend URL (including https://).
+
+### Issue: MongoDB connection failed
+**Solution**: Check `MONGODB_URI` in `.env` file. Verify MongoDB is running (local) or check Atlas credentials.
+
+### Issue: JWT token invalid
+**Solution**: Ensure `JWT_SECRET` in `.env` is at least 32 characters. Check token hasn't expired (default 1 hour).
+
+### Issue: Rate limiting blocking legitimate requests
+**Solution**: For testing, temporarily increase limits in `backend/middleware/security.js` or clear localStorage and wait 15 minutes.
+
+### Issue: Validation errors on registration
+**Solution**: Ensure all fields match the required formats (see validation patterns above).
+
+---
+
+## 📊 API Endpoints
+
+### Authentication Endpoints
+
+#### POST /api/auth/register
+Register a new user
+```json
+{
+  "fullName": "John Doe",
+  "idNumber": "9001015009087",
+  "accountNumber": "1234567890",
+  "username": "johndoe",
+  "password": "Test@1234"
+}
+```
+
+#### POST /api/auth/login
+Authenticate user
+```json
+{
+  "username": "johndoe",
+  "accountNumber": "1234567890",
+  "password": "Test@1234"
+}
+```
+
+#### GET /api/auth/me
+Get current user (requires JWT token)
+
+### Payment Endpoints
+
+#### POST /api/payments
+Create new payment (requires JWT token)
+```json
+{
+  "amount": 1000.00,
+  "currency": "USD",
+  "provider": "SWIFT",
+  "payeeAccount": "9876543210",
+  "swiftCode": "ABNANL2A"
+}
+```
+
+#### GET /api/payments
+Get user's payments (requires JWT token)
+
+#### GET /api/payments/:id
+Get specific payment (requires JWT token)
+
+---
+
+## 📹 Demo Video
+
+**Video Link**: [Insert YouTube Unlisted Link Here]
+
+**Video Contents**:
+- Security architecture overview
+- SSL/HTTPS demonstration
+- User registration with validation
+- Authentication and JWT tokens
+- Payment creation
+- Input validation testing
+- Protected routes demonstration
+- Security headers inspection
+- Database security (hashed passwords)
+
+**Duration**: ~10 minutes
+
+---
+
+## ✅ POE Requirements Checklist
+
+### Task 2 Requirements - All Met ✓
+
+- [x] **Password Security**: Bcrypt hashing and salting implemented
+- [x] **Input Whitelisting**: RegEx patterns on all inputs
+- [x] **SSL/TLS**: All traffic served over HTTPS
+- [x] **Session Hijacking Protection**: JWT tokens, secure storage, expiry
+- [x] **Clickjacking Protection**: X-Frame-Options, CSP headers
+- [x] **SQL Injection Protection**: MongoDB with validation, parameterized queries
+- [x] **XSS Protection**: Input sanitization, output encoding, CSP
+- [x] **MITM Protection**: TLS encryption, HSTS, secure certificates
+- [x] **DDoS Protection**: Rate limiting, brute force protection, throttling
+- [x] **Video Demonstration**: OBS recording showing all features
+
+---
+
+## 🔮 Future Enhancements (Part 3)
+
+- Employee portal with pre-registered users
+- Payment verification workflow
+- Submit to SWIFT functionality
+- DevSecOps pipeline with SonarQube
+- CircleCI integration
+- Additional security scanning tools
+
+---
+
+## 📚 References
+
+- OWASP Top 10: https://owasp.org/www-project-top-ten/
+- OWASP Cheat Sheets: https://cheatsheetseries.owasp.org/
+- JWT Best Practices: https://tools.ietf.org/html/rfc7519
+- Helmet.js Documentation: https://helmetjs.github.io/
+- bcrypt Documentation: https://www.npmjs.com/package/bcryptjs
+- Express Rate Limit: https://www.npmjs.com/package/express-rate-limit
+
+---
+
+## 📝 Notes
+
+- This is an academic project for educational purposes
+- Self-signed certificates are used for development only
+- For production deployment, use proper SSL certificates (Let's Encrypt, etc.)
+- MongoDB Atlas is recommended for production database hosting
+- Environment variables should never be committed to version control
+
+---
+
+## 🆘 Support
+
+For issues or questions:
+- Contact team members via university email
+- Refer to POE documentation
+- Check OWASP guidelines for security best practices
+
+---
+
+**Last Updated**: October 2025
+**Version**: 1.0.0 - Part 2 Submission
