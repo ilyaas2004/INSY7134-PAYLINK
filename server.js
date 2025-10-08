@@ -46,19 +46,12 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV === 'production') {
-  // Production: Use HTTPS/SSL
-  const sslOptions = {
-    key: fs.readFileSync(process.env.SSL_KEY_PATH),
-    cert: fs.readFileSync(process.env.SSL_CERT_PATH),
-  };
+const sslOptions = {
+  key: fs.readFileSync(process.env.SSL_KEY_PATH),
+  cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+};
 
-  https.createServer(sslOptions, app).listen(PORT, () => {
-    console.log(`HTTPS Server running on https://localhost:${PORT}`);
-  });
-} else {
-  // Development: use plain HTTP
-  app.listen(PORT, () => {
-    console.log(`HTTP Server running on http://localhost:${PORT}`);
-  });
-}
+// Start HTTPS server
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`HTTPS Server running on https://localhost:${PORT}`);
+});
