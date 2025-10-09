@@ -73,6 +73,7 @@ exports.register = async (req, res) => {
 
 };
 
+
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
@@ -80,10 +81,26 @@ exports.login = async (req, res) => {
   try {
     const { username, accountNumber, password } = req.body;
 
-    // Find user by username and account number
-    const user = await User.findOne({ 
-      username, 
-      accountNumber 
+    // Basic input validation
+    if (
+      typeof username !== 'string' ||
+      typeof accountNumber !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid input types',
+      });
+    }
+
+    // Sanitize inputs
+    const sanitizedUsername = username.trim();
+    const sanitizedAccountNumber = accountNumber.trim();
+
+    // Find user by sanitized values
+    const user = await User.findOne({
+      username: sanitizedUsername,
+      accountNumber: sanitizedAccountNumber,
     }).select('+password');
 
     if (!user) {
@@ -125,6 +142,7 @@ exports.login = async (req, res) => {
     });
   }
 };
+
 
 // @desc    Get current user
 // @route   GET /api/auth/me
