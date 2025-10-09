@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-// Base URL for API - change to HTTPS when ready
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Base URL for API - using HTTPS for local development
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:5000/api';
+
+// Configure axios to handle self-signed certificates in development
+if (process.env.NODE_ENV === 'development') {
+  // Disable SSL verification for self-signed certificates in development
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+}
 
 // Create axios instance
 const api = axios.create({
