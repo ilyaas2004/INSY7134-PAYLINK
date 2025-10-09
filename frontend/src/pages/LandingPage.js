@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Globe, Shield, CreditCard } from 'lucide-react';
+import { Shield, CreditCard } from 'lucide-react';
 
 const LandingPage = () => {
   return (
@@ -8,9 +8,12 @@ const LandingPage = () => {
       <div className="relative z-10 max-w-6xl w-full">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="bg-gradient-to-br from-blue-400 to-indigo-500 p-4 rounded-full shadow-2xl">
-              <Globe className="w-16 h-16 text-white" />
-            </div>
+            {/* logo */}
+            <img 
+              src="/IMG-20250915-WA0000.jpg" 
+              alt="PayLink Logo"
+              className="w-24 h-24 rounded-full shadow-2xl border-4 border-white/30 object-cover"
+            />
           </div>
           <h1 className="text-6xl font-bold text-white mb-4">PayLink</h1>
           <p className="text-xl text-blue-200">Secure International Payments Made Simple</p>
