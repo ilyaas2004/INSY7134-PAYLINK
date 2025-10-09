@@ -74,12 +74,9 @@ exports.register = async (req, res) => {
 };
 
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 exports.login = async (req, res) => {
   try {
-    const { username, accountNumber, password } = req.body;
+    let { username, accountNumber, password } = req.body;
 
     // Basic input validation
     if (
@@ -93,14 +90,13 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Sanitize inputs
-    const sanitizedUsername = username.trim();
-    const sanitizedAccountNumber = accountNumber.trim();
+    // ✅ Sanitize inputs to prevent NoSQL injection
+    username = username.replace(/[^a-zA-Z0-9]/g, '').trim();
+    accountNumber = accountNumber.replace(/[^0-9]/g, '').trim();
 
-    // Find user by sanitized values
     const user = await User.findOne({
-      username: sanitizedUsername,
-      accountNumber: sanitizedAccountNumber,
+      username,
+      accountNumber,
     }).select('+password');
 
     if (!user) {
@@ -112,7 +108,6 @@ exports.login = async (req, res) => {
 
     // Check password
     const isPasswordMatch = await user.comparePassword(password);
-
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
