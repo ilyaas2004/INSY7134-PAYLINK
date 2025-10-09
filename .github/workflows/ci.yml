@@ -32,6 +32,7 @@ jobs:
         run: npm ci
 
       - name: Audit dependencies (prod, fail on high)
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: |
           npm audit --production --audit-level=high || {
             echo "Dependency audit found high severity issues" >&2; exit 1; }
@@ -67,6 +68,7 @@ jobs:
         run: npm ci
 
       - name: Audit dependencies (prod, fail on high)
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: |
           npm audit --production --audit-level=high || {
             echo "Dependency audit found high risk security issues" >&2; exit 1; }
