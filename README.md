@@ -13,7 +13,10 @@ PayLink is a secure web-based international payment portal that enables customer
 ------------------------------------------
 
 ## YouTube Link:
+[![Watch the video](https://img.youtube.com/vi/5L26TxlCIS4/maxresdefault.jpg)](https://youtu.be/5L26TxlCIS4)
 
+Youtube link:
+https://youtu.be/5L26TxlCIS4
 
 ## Developement Team 👨‍💻
 
