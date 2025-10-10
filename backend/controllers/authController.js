@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { recordFailedAttempt, resetAttempts } = require('../middleware/security');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -15,7 +16,6 @@ exports.register = async (req, res) => {
   try {
     const { fullName, idNumber, accountNumber, username, password } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({
       $or: [{ username }, { accountNumber }, { idNumber }],
     });
@@ -27,7 +27,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
     const user = await User.create({
       fullName,
       idNumber,
@@ -36,7 +35,6 @@ exports.register = async (req, res) => {
       password,
     });
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -51,71 +49,62 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
-  console.error(error);
-  if (error.name === 'ValidationError') {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-  if (error.code === 11000) {
-    return res.status(400).json({
-      success: false,
-      message: 'Duplicate field value entered',
-      fields: error.keyValue
-    });
-  }
-  res.status(500).json({
-    success: false,
-    message: 'Server error during registration',
-  });
-}
-
-};
-
-
-exports.login = async (req, res) => {
-  try {
-    let { username, accountNumber, password } = req.body;
-
-    // Basic input validation
-    if (
-      typeof username !== 'string' ||
-      typeof accountNumber !== 'string' ||
-      typeof password !== 'string'
-    ) {
+    console.error(error);
+    if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
-        message: 'Invalid input types',
+        message: error.message,
       });
     }
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Duplicate field value entered',
+        fields: error.keyValue
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: 'Server error during registration',
+    });
+  }
+};
 
-    // ✅ Sanitize inputs to prevent NoSQL injection
-    username = username.replace(/[^a-zA-Z0-9]/g, '').trim();
-    accountNumber = accountNumber.replace(/[^0-9]/g, '').trim();
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+exports.login = async (req, res) => {
+  try {
+    const { username, accountNumber, password } = req.body;
 
-    const user = await User.findOne({
-      username,
-      accountNumber,
+    const user = await User.findOne({ 
+      username, 
+      accountNumber 
     }).select('+password');
 
     if (!user) {
+      // Record failed attempt
+      recordFailedAttempt(username);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials',
       });
     }
 
-    // Check password
     const isPasswordMatch = await user.comparePassword(password);
+
     if (!isPasswordMatch) {
+      // Record failed attempt
+      recordFailedAttempt(username);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials',
       });
     }
 
-    // Generate token
+    // Successful login - reset attempts
+    resetAttempts(username);
+
     const token = generateToken(user._id);
 
     res.status(200).json({
@@ -137,7 +126,6 @@ exports.login = async (req, res) => {
     });
   }
 };
-
 
 // @desc    Get current user
 // @route   GET /api/auth/me
