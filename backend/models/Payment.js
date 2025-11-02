@@ -40,6 +40,27 @@ const paymentSchema = new mongoose.Schema({
     enum: ['pending', 'verified', 'completed', 'rejected'],
     default: 'pending'
   },
+
+  // ✅ Employee Portal fields
+  verifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee'
+  },
+  verifiedAt: {
+    type: Date
+  },
+  submittedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee'
+  },
+  submittedAt: {
+    type: Date
+  },
+  rejectionReason: {
+    type: String,
+    trim: true
+  },
+
   createdAt: {
     type: Date,
     default: Date.now

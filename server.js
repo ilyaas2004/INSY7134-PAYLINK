@@ -33,7 +33,7 @@ app.use(
 // Routes
 app.use('/api/auth', require('./backend/routes/auth'));
 app.use('/api/payments', require('./backend/routes/payment'));
-
+app.use('/api/employee', require('./backend/routes/employee'));
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running' });
