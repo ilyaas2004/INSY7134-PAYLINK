@@ -1,0 +1,25 @@
+name: SonarQube (SonarCloud) Analysis
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sonarcloud:
+    name: Analyze with SonarCloud (skeleton)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Placeholder
+        run: echo "SonarCloud analysis will be enabled later."
+
+

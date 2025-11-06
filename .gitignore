@@ -1,1 +1,4 @@
 .env 
+
+# SonarQube local scanner artifacts (if used locally)
+.scannerwork/
