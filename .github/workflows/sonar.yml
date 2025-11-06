@@ -1,0 +1,63 @@
+name: SonarQube (SonarCloud) Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sonarcloud:
+    name: Analyze with SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+        continue-on-error: true
+
+      - name: Check for SonarCloud token
+        id: check_token
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "token_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "token_exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: SonarCloud Scan
+        if: steps.check_token.outputs.token_exists == 'true'
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectBaseDir=.
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: SonarCloud Scan Skipped
+        if: steps.check_token.outputs.token_exists == 'false'
+        run: |
+          echo "SonarCloud scan skipped: SONAR_TOKEN secret not yet configured"
+          echo "To enable SonarCloud analysis, add SONAR_TOKEN to the repository secrets"
+
+
