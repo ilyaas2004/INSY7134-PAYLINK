@@ -1,5 +1,12 @@
 name: SonarQube (SonarCloud) Analysis
+
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -8,7 +15,7 @@ permissions:
 
 jobs:
   sonarcloud:
-    name: Analyze with SonarCloud (skeleton)
+    name: Analyze with SonarCloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,7 +26,22 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - name: Placeholder
-        run: echo "SonarCloud analysis will be enabled later."
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+        continue-on-error: true
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectBaseDir=.
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
