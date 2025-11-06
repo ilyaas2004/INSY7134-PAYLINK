@@ -35,7 +35,17 @@ jobs:
         run: npm ci
         continue-on-error: true
 
+      - name: Check for SonarCloud token
+        id: check_token
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "token_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "token_exists=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: SonarCloud Scan
+        if: steps.check_token.outputs.token_exists == 'true'
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
@@ -43,5 +53,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: SonarCloud Scan Skipped
+        if: steps.check_token.outputs.token_exists == 'false'
+        run: |
+          echo "SonarCloud scan skipped: SONAR_TOKEN secret not yet configured"
+          echo "To enable SonarCloud analysis, add SONAR_TOKEN to the repository secrets"
 
 

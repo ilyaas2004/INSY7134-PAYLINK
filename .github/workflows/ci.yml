@@ -35,11 +35,21 @@ jobs:
         continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: |
           npm audit --production --audit-level=high || {
-            echo "Dependency audit found high severity issues" >&2; exit 1; }
+            echo "Dependency audit has found high severity security issues" >&2
+            echo "Run 'npm audit' to see details and 'npm audit fix' to try and attempt automatic fixes" >&2
+            exit 1
+          }
 
       - name: Lint (if configured)
         run: |
-          if npm run | grep -qE '^\s*lint\s'; then npm run lint; else echo "No lint script"; fi
+          if npm run | grep -qE '^\s*lint\s'; then 
+            npm run lint || {
+              echo "Linting failed. Please try and fix the errors above." >&2
+              exit 1
+            }
+          else 
+            echo "No lint script found, skipping the lint step"
+          fi
 
       - name: Run tests (if configured)
         env:
@@ -71,19 +81,26 @@ jobs:
         continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: |
           npm audit --production --audit-level=high || {
-            echo "Dependency audit found high risk security issues" >&2; exit 1; }
+            echo "Dependency audit has found high risk security issues" >&2; exit 1; }
 
       - name: Lint (if configured)
         run: |
-          if npm run | grep -qE '^\s*lint\s'; then npm run lint; else echo "No lint script"; fi
+          if npm run | grep -qE '^\s*lint\s'; then 
+            npm run lint || {
+              echo "Linting failed. Please try and fix the errors above." >&2
+              exit 1
+            }
+          else 
+            echo "No lint script found, skipping the lint step"
+          fi
 
       - name: Run tests (if configured)
         env:
           CI: true
         run: |
-          if npm run | grep -qE '^\s*test\s'; then npm test --silent; else echo "No test script"; fi
+          if npm run | grep -qE '^\s*test\s'; then npm test --silent; else echo "No test script found"; fi
 
       - name: Build (if configured)
         run: |
-          if npm run | grep -qE '^\s*build\s'; then npm run build; else echo "No build script"; fi
+          if npm run | grep -qE '^\s*build\s'; then npm run build; else echo "No build script found"; fi
 
